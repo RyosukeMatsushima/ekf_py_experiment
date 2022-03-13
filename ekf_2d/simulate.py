@@ -14,15 +14,16 @@ ekf = EKF()
 X = 0.0
 X_dot = 1.0
 Y = 0.0
-Y_dot = 1.0
+Y_dot = 4.0
 yaw = 0.0
 yaw_dot = 1.0
 init_state = (X, X_dot, Y, Y_dot, yaw, yaw_dot)
 rigidBody2D = RigidBody2D(init_state)
+rigidBody2D.input = (1.0, 0.1, 0.00002)
 
 time = 0.
 dt = 10**(-2)
-max_step = 60 * 10**(2) + 1
+max_step = 10 * 10**(2) + 1
 
 df = pd.DataFrame(columns=['time',
                            'X',
@@ -34,8 +35,8 @@ df = pd.DataFrame(columns=['time',
 
 ekf_df = pd.DataFrame(columns=['time',
                                'X',
-                               'X_dot',
                                'Y',
+                               'X_dot',
                                'Y_dot',
                                'yaw'])
 
@@ -48,7 +49,6 @@ for s in range(0, max_step):
     print(tmp_data)
     tmp_se = pd.Series(tmp_data, index=df.columns)
     df = df.append(tmp_se, ignore_index=True)
-    rigidBody2D.step(dt)
 
     # generate sensor_data
     imu_data = rigidBody2D.get_sensor_data()
@@ -57,7 +57,7 @@ for s in range(0, max_step):
                           [imu_data['angle_rate']] ])
 
     pos_data = np.array([ [rigidBody2D.state[0]],
-                          [rigidBody2D.state[1]] ])
+                          [rigidBody2D.state[2]] ])
 
     # update ekf
     estimated_state = ekf.update( pos_data, imu_data, time )
@@ -67,15 +67,18 @@ for s in range(0, max_step):
     tmp_se = pd.Series(tmp_data, index=ekf_df.columns)
     ekf_df = ekf_df.append(tmp_se, ignore_index=True)
 
-df.plot(x='X', y='Y')
-df.plot(x='time', y='X')
-df.plot(x='time', y='Y')
-df.plot(x='time', y='yaw')
-plt.show()
+    rigidBody2D.step(dt)
+
 
 ekf_df.plot(x='X', y='Y')
+df.plot(x='X', y='Y')
+
 ekf_df.plot(x='time', y='X')
+df.plot(x='time', y='X')
 ekf_df.plot(x='time', y='Y')
+df.plot(x='time', y='Y')
+
 ekf_df.plot(x='time', y='yaw')
+df.plot(x='time', y='yaw')
 plt.show()
 

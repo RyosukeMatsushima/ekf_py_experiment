@@ -15,7 +15,6 @@ class EKF:
         self.C = np.array([[1.0, 0.0, 0.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0, 0.0, 0.0]])
         self.R = np.array([[1.0], [1.0]])
-        self._states_len = len(self.x)
 
         self.last_update_t = 0.0
 
