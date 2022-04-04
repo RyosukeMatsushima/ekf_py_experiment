@@ -23,11 +23,11 @@ init_state = (X, X_dot, Y, Y_dot, yaw, yaw_dot)
 rigidBody2D = RigidBody2D(init_state)
 #rigidBody2D.input = (0.001, 0.001, 0.00002)
 rigidBody2D.input = (1.0, 1.0, 0.0)
-rigidBody2D.input = (0.001, 0.001, 0.0)
+rigidBody2D.input = (0.01, 0.01, 0.0001)
 
 time = 0.
 dt = 10**(-2)
-max_step = 30 * 10**(2) + 1
+max_step = 300 * 10**(2) + 1
 
 state_df = pd.DataFrame(columns=['time',
                                  'X',
@@ -62,7 +62,7 @@ for s in range(0, max_step):
     imu_data = rigidBody2D.get_sensor_data()
     imu_data = np.array([ [imu_data['accel'][0] + 0.1 * np.random.randn()],
                           [imu_data['accel'][1] + 0.1 * np.random.randn()],
-                          [imu_data['angle_rate'] + 0.000001 * np.random.randn()] ])
+                          [imu_data['angle_rate'] + 0.1 * np.random.randn()] ])
 
     pos_data = np.array([ [rigidBody2D.state[0] + 0.01 * np.random.randn()],
                           [rigidBody2D.state[2] + 0.01 * np.random.randn()] ])
@@ -78,11 +78,11 @@ for s in range(0, max_step):
              + tuple( val[0] for val in estimated_state ) \
              + (rigidBody2D.state[0] - estimated_state[0], \
                 rigidBody2D.state[2] - estimated_state[1], \
-                rigidBody2D.state[4] - estimated_state[4]) \
+                ekf.yaw_correction(rigidBody2D.state[4]) - estimated_state[4]) \
              + tuple( val[0] for val in only_integ_state ) \
              + (rigidBody2D.state[0] - only_integ_state[0], \
                 rigidBody2D.state[2] - only_integ_state[1], \
-                rigidBody2D.state[4] - only_integ_state[4])
+                ekf.yaw_correction(rigidBody2D.state[4]) - only_integ_state[4])
     tmp_se = pd.Series(tmp_data, index=state_df.columns)
     state_df = state_df.append(tmp_se, ignore_index=True)
  
