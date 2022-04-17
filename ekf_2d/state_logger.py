@@ -15,7 +15,16 @@ class StateLogger:
         self.data_stock.append(data)
 
         if len(self.data_stock) > 100000:
-            df = pd.DataFrame(self.data_stock, columns=self.columns)
-            df.to_csv(self.file_name, mode='a', header=False)
-            self.data_stock = []
+            self.save_to_file()
+
+    def finish(self):
+        self.save_to_file()
+
+    def save_to_file(self):
+        if not self.data_stock:
+            return
+
+        df = pd.DataFrame(self.data_stock, columns=self.columns)
+        df.to_csv(self.file_name, mode='a', header=False)
+        self.data_stock = []
 
