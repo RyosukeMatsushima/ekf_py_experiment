@@ -6,17 +6,17 @@ class EKF:
 
         # states: [position_x, position_y, velocity_x, velocity_y, yaw]
         self.x = np.array([[0.0, 0.0, 0.0, 0.0, 0.0]]).T
-        self.P = np.array([[1, 0.0, 0.0, 0.0, 0.0],
-                           [0.0, 1, 0.0, 0.0, 0.0],
-                           [0.0, 0.0, 1, 0.0, 0.0],
-                           [0.0, 0.0, 0.0, 1, 0.0],
-                           [0.0, 0.0, 0.0, 0.0, 0.0000001]])
-        self.Q = np.array([[0.1, 0.0, 0.0],
-                           [0.0, 0.1, 0.0],
-                           [0.0, 0.0, 0.01]])
+        self.P = np.array([[0.01, 0.0, 0.0, 0.0, 0.0],
+                           [0.0, 0.01, 0.0, 0.0, 0.0],
+                           [0.0, 0.0, 0.01, 0.0, 0.0],
+                           [0.0, 0.0, 0.0, 0.01, 0.0],
+                           [0.0, 0.0, 0.0, 0.0, 0.000000001]])
+        self.Q = np.array([[0.01, 0.0, 0.0],
+                           [0.0, 0.01, 0.0],
+                           [0.0, 0.0, 0.0000001]])
         self.C = np.array([[1.0, 0.0, 0.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0, 0.0, 0.0]])
-        self.R = np.array([[0.01], [0.01]])
+        self.R = np.array([[0.00000001], [0.00000001]])
 
         self.last_update_t = 0.0
 
@@ -47,8 +47,7 @@ class EKF:
 
         self.P = (np.eye(len(self.x)) - G @ self.C) @ P_p
 
-        print(self.P)
-        self.x[4] = self.yaw_correction(self.x[4])
+        # self.x[4] = self.yaw_correction(self.x[4])
 
         return self.x
 
@@ -62,8 +61,8 @@ class EKF:
 
         A = np.array([[0.0, 0.0, 1.0, 0.0, 0.0],
                       [0.0, 0.0, 0.0, 1.0, 0.0],
-                      [0.0, 0.0, 0.0, 0.0, yaw_rate * (-a_x * np.sin(yaw) - a_y * np.cos(yaw))],
-                      [0.0, 0.0, 0.0, 0.0, yaw_rate * (a_x * np.cos(yaw) - a_y * np.sin(yaw))],
+                      [0.0, 0.0, 0.0, 0.0, -a_x * np.sin(yaw) - a_y * np.cos(yaw)],
+                      [0.0, 0.0, 0.0, 0.0, a_x * np.cos(yaw) - a_y * np.sin(yaw)],
                       [0.0, 0.0, 0.0, 0.0, 0.0]])
         A = np.eye(len(self.x)) + A * dt
 
@@ -89,6 +88,6 @@ class OnlyIntegral(EKF):
         self.last_update_t = t
         x_p, P_p = self.predict(u, dt)
         self.x = x_p
-        self.x[4] = self.yaw_correction(self.x[4])
+        # self.x[4] = self.yaw_correction(self.x[4])
 
         return self.x
