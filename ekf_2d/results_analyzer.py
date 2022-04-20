@@ -13,6 +13,7 @@ def show_plt(title, data_list):
 true_state = pd.read_csv('true_state.csv')
 ekf_state = pd.read_csv('ekf_state.csv')
 integral_state = pd.read_csv('integral_state.csv')
+target_state = pd.read_csv('target_state.csv')
 
 show_plt('X Y', [[ekf_state['X'], ekf_state['Y'], 'ekf'],
                  [integral_state['X'], integral_state['Y'], 'only integral'],
@@ -30,5 +31,15 @@ show_plt('Y error', [[ekf_state['time'], ekf_state['Y'] - true_state['Y'], 'ekf'
 
 show_plt('yaw error', [[ekf_state['time'], ekf_state['yaw'] - true_state['yaw'], 'ekf'],
                      [integral_state['time'], integral_state['yaw'] - true_state['yaw'], 'only integral']])
+
+show_plt('X', [[target_state['time'], target_state['X'], 'target'],
+                 [true_state['time'], true_state['X'], 'true']])
+
+show_plt('Y', [[target_state['time'], target_state['Y'], 'target'],
+                 [true_state['time'], true_state['Y'], 'true']])
+
+show_plt('yaw', [[target_state['time'], target_state['yaw'], 'target'],
+                 [true_state['time'], true_state['yaw'], 'true']])
+
 
 plt.show()
