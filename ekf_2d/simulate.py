@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import pathlib
+import os
 
 from state_logger import StateLogger
 from control import Control
@@ -14,32 +15,35 @@ from ekf import OnlyIntegral
 ekf = EKF()
 onlyIntegral = OnlyIntegral()
 
-trueStateLogger = StateLogger('true_state.csv', ('time',
-                                                 'X',
-                                                 'Y',
-                                                 'X_dot',
-                                                 'Y_dot',
-                                                 'yaw',
-                                                 'yaw_dot'))
+log_dir = str(current_dir) + '/log/'
+os.makedirs(log_dir, exist_ok=True)
 
-ekfStateLogger = StateLogger('ekf_state.csv', ('time',
-                                                'X',
-                                                'Y',
-                                                'X_dot',
-                                                'Y_dot',
-                                                'yaw'))
+trueStateLogger = StateLogger(log_dir + 'true_state.csv', ('time',
+                                                           'X',
+                                                           'Y',
+                                                           'X_dot',
+                                                           'Y_dot',
+                                                           'yaw',
+                                                           'yaw_dot'))
 
-integralStateLogger = StateLogger('integral_state.csv', ('time',
+ekfStateLogger = StateLogger(log_dir + 'ekf_state.csv', ('time',
                                                          'X',
                                                          'Y',
                                                          'X_dot',
                                                          'Y_dot',
                                                          'yaw'))
 
-targetStateLogger = StateLogger('target_state.csv', ('time',
-                                                     'X',
-                                                     'Y',
-                                                     'yaw'))
+integralStateLogger = StateLogger(log_dir + 'integral_state.csv', ('time',
+                                                                   'X',
+                                                                   'Y',
+                                                                   'X_dot',
+                                                                   'Y_dot',
+                                                                   'yaw'))
+
+targetStateLogger = StateLogger(log_dir + 'target_state.csv', ('time',
+                                                               'X',
+                                                               'Y',
+                                                               'yaw'))
 
 X = 0.0
 X_dot = 0.0

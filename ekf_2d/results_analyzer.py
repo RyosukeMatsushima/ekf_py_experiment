@@ -1,5 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+
+import pathlib
+current_dir = pathlib.Path(__file__).resolve().parent
+log_dir = str(current_dir) + '/log/'
+
 def show_plt(title, data_list):
     fig = plt.figure(figsize=(6, 4))
     ax = fig.add_subplot(111)
@@ -10,10 +15,10 @@ def show_plt(title, data_list):
 
     plt.legend()
 
-true_state = pd.read_csv('true_state.csv')
-ekf_state = pd.read_csv('ekf_state.csv')
-integral_state = pd.read_csv('integral_state.csv')
-target_state = pd.read_csv('target_state.csv')
+true_state = pd.read_csv(log_dir + 'true_state.csv')
+ekf_state = pd.read_csv(log_dir + 'ekf_state.csv')
+integral_state = pd.read_csv(log_dir + 'integral_state.csv')
+target_state = pd.read_csv(log_dir + 'target_state.csv')
 
 show_plt('X Y', [[ekf_state['X'], ekf_state['Y'], 'ekf'],
                  [integral_state['X'], integral_state['Y'], 'only integral'],
