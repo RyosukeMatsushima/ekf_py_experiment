@@ -16,7 +16,7 @@ class EKF:
                            [0.0, 0.0, 0.0000001]])
         self.C = np.array([[1.0, 0.0, 0.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0, 0.0, 0.0]])
-        self.R = np.array([[0.00000001], [0.00000001]])
+        self.R = np.array([[0.00001], [0.00001]])
 
         self.last_update_t = 0.0
 
@@ -26,9 +26,19 @@ class EKF:
     # return predict states
     def predict(self, u, dt):
 
-        A, B, A_d = self.get_liner_model(self.x, u, dt)
+        a_x = u[0][0]
+        a_y = u[1][0]
+        yaw_rate = u[2][0]
+        yaw = self.x[4][0]
 
-        x_predict = A_d @ self.x + B @ u
+        x_dot = np.array([[self.x[2][0],
+                           self.x[3][0],
+                           a_x * np.cos(yaw) - a_y * np.sin(yaw),
+                           a_x * np.sin(yaw) + a_y * np.cos(yaw),
+                           yaw_rate]]).T
+        x_predict = self.x + x_dot * dt
+
+        A, B = self.get_liner_model(a_x, a_y, yaw_rate, yaw, dt)
         P_predict = A @ self.P @ A.T + B @ self.Q @ B.T
 
         return x_predict, P_predict
@@ -47,17 +57,10 @@ class EKF:
 
         self.P = (np.eye(len(self.x)) - G @ self.C) @ P_p
 
-        # self.x[4] = self.yaw_correction(self.x[4])
-
         return self.x
 
     # return liner model matrix A, B_u, B
-    def get_liner_model(self, x, u, dt):
-
-        a_x = u[0][0]
-        a_y = u[1][0]
-        yaw_rate = u[2][0]
-        yaw = x[4][0]
+    def get_liner_model(self, a_x, a_y, yaw_rate, yaw, dt):
 
         A = np.array([[0.0, 0.0, 1.0, 0.0, 0.0],
                       [0.0, 0.0, 0.0, 1.0, 0.0],
@@ -66,17 +69,14 @@ class EKF:
                       [0.0, 0.0, 0.0, 0.0, 0.0]])
         A = np.eye(len(self.x)) + A * dt
 
-        A_d = np.array([[0.0, 0.0, 1.0, 0.0, 0.0],
-                      [0.0, 0.0, 0.0, 1.0, 0.0],
-                      [0.0, 0.0, 0.0, 0.0, 0.0],
-                      [0.0, 0.0, 0.0, 0.0, 0.0],
-                      [0.0, 0.0, 0.0, 0.0, 0.0]])
-        A_d = np.eye(len(self.x)) + A_d * dt
+        B = np.array([[0.0, 0.0, 0.0],
+                      [0.0, 0.0, 0.0],
+                      [np.cos(yaw), -np.sin(yaw), 0.0],
+                      [np.sin(yaw), np.cos(yaw), 0.0],
+                      [0.0, 0.0, 1.0]])
+        B = B * dt
 
-
-        B = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [np.cos(yaw), -np.sin(yaw), 0.0], [np.sin(yaw), np.cos(yaw), 0.0], [0.0, 0.0, 1.0]]) * dt
-
-        return A, B, A_d
+        return A, B
 
     def yaw_correction(self, yaw):
         return yaw - int(yaw/np.pi) * np.pi
@@ -88,6 +88,5 @@ class OnlyIntegral(EKF):
         self.last_update_t = t
         x_p, P_p = self.predict(u, dt)
         self.x = x_p
-        # self.x[4] = self.yaw_correction(self.x[4])
 
         return self.x
