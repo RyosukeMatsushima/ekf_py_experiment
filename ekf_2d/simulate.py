@@ -54,7 +54,12 @@ controller = Control()
 
 time = 0.
 dt = 10**(-2)
-max_step = 1000 * 10**(2) + 1
+
+try:
+    simulate_range = int(sys.argv[1]) # second
+    max_step = simulate_range * 10**(2) + 1
+except:
+    raise ValueError("Oops! Please add simulation range as argument.")
 
 # def add_data(df):
 for s in range(0, max_step):
