@@ -11,7 +11,7 @@ The data flow is here.
 ## Setup
 Clone the repository and submodule.
 ```bash
-git clone git@github.com:RyosukeMatsushima/ekf_py_experiment.git --recursive
+git clone https://github.com/RyosukeMatsushima/ekf_python_experiment.git --recursive
 ```
 
 ## 2D robot model
