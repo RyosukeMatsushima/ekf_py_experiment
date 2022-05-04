@@ -19,23 +19,10 @@ git clone git@github.com:RyosukeMatsushima/ekf_py_experiment.git --recursive
 
 ![2d robot model](docs/2d_robot_model.png)
 
-The state to estimate is
+The state estimated by EKF is position X, Y in inertial coordinate system and it's velocity and yaw.
 
-$$
-x = 
-\begin{bmatrix}
-X\\
-Y\\
-\dot{X}\\
-\dot{Y}\\
-\theta\\
-\end{bmatrix}.
-$$
-
-IMU sensor data to predict are acceleration $[a_x, a_y]$ and angular velocity $\omega$ on robot coodinate.
-
-Position data to update state is $[y_X, y_Y]$.
-
+IMU sensor data to predict the state are acceleration and angular velocity on robot coodinate.
+Position data is needed to update state.
 All input data includes sensor noise.
 
 ### Run
