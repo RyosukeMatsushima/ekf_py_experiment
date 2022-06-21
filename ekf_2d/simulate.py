@@ -65,7 +65,6 @@ try:
 except:
     raise ValueError("Oops! Please add simulation range as argument.")
 
-# def add_data(df):
 for s in range(0, max_step):
     time = s * dt
     if s % int(1 / dt * 10) == 0:
